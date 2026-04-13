@@ -1,0 +1,47 @@
+# --- Unity Default ---
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+MemoryCaptures/
+UserSettings/
+
+# --- Tránh upload các file giải pháp của Visual Studio ---
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.IDB
+*.VC.db
+
+# --- Tránh các file hệ thống ---
+.DS_Store
+Thumbs.db
+
+# --- Tránh các file Asset bị khóa hoặc tạm thời ---
+*.swp
+*.lock
+*.meta.lock
+
+# --- Unity Crash Handler ---
+sysinfo.txt
+
+# --- Builds ---
+*.apk
+*.unitypackage
+*.app
+.vs/
+*.pidb.meta
+*.pdb.meta
+.idea/
+*.sln.iml
+*.stackdump
