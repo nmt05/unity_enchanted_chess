@@ -53,7 +53,8 @@ public class Game : MonoBehaviour {
         HandleMenuInput();
         HandleSettingsButton();
         bool isPvP1v1 = (data.mem.total_players == 2 && data.mem.play_against_AI == 0);
-        if (isPvP1v1) {
+        bool isMyTurnOnline = !data.mem.is_online_game || (net_manager.instance != null && data.mem.current_player_color == net_manager.instance.my_color);
+        if (isPvP1v1 && isMyTurnOnline) {
             card_util.handle_card_input(data.mem.current_player_color);
             
             if (Input.GetKeyDown(KeyCode.K)) card_util.add_card(0, CardType.Rock);
@@ -120,6 +121,7 @@ public class Game : MonoBehaviour {
         MakeMenuBg();
         data.mem.pvp_button = gui_util.make_button_sprite(MENU_PVP_X, MENU_ROW_Y, data.mem.pvp_btn_sprite,3.0f, 1.5f);
         data.mem.pve_button = gui_util.make_button_sprite(MENU_PVE_X, MENU_ROW_Y, data.mem.pve_btn_sprite,3.0f, 1.5f);
+        data.mem.online_pvp_button = gui_util.make_button_wide(0f, MENU_ROW_Y - 1.2f, new Color(0.2f, 0.8f, 0.9f), "Online PvP");
         data.mem.menu_state = data.MenuState.Main;
         }
 
@@ -165,6 +167,15 @@ public class Game : MonoBehaviour {
                 }
                 if (gui_util.clicked(data.mem.pve_button)) {
                     ShowPlayerCountMenu(true);
+                    anyClicked = true;
+                }
+                if (gui_util.clicked(data.mem.online_pvp_button)) {
+                    if (net_manager.instance != null) {
+                        net_manager.instance.ConnectToPhoton();
+                        ShowOnlineLobby();
+                    } else {
+                        Debug.LogError("net_manager not found! Add NetworkManager to scene.");
+                    }
                     anyClicked = true;
                 }
                 break;
@@ -240,6 +251,34 @@ public class Game : MonoBehaviour {
                     anyClicked = true;
                 }
                 break;
+
+            case data.MenuState.OnlineLobby:
+                if (gui_util.clicked(data.mem.btn_create_room)) {
+                    net_manager.instance.CreateRoom();
+                    anyClicked = true;
+                }
+                if (gui_util.clicked(data.mem.btn_join_room)) {
+                    net_manager.instance.ShowJoinRoomGUI();
+                    anyClicked = true;
+                }
+                if (gui_util.clicked(data.mem.btn_random_match)) {
+                    net_manager.instance.JoinRandom();
+                    anyClicked = true;
+                }
+                if (gui_util.clicked(data.mem.back_button)) {
+                    if (net_manager.instance != null) net_manager.instance.LeaveOnlineGame();
+                    ShowMainMenu();
+                    anyClicked = true;
+                }
+                break;
+
+            case data.MenuState.WaitingForOpponent:
+                if (gui_util.clicked(data.mem.back_button)) {
+                    if (net_manager.instance != null) net_manager.instance.LeaveOnlineGame();
+                    ShowMainMenu();
+                    anyClicked = true;
+                }
+                break;
         }
         if (anyClicked) {
         sound_util.play_sound(data.mem.clicksound); // Phát tiếng click
@@ -255,6 +294,36 @@ public class Game : MonoBehaviour {
     void StartGame_AI(AIDifficulty diff) {
         data.mem.ai_difficulty = diff;
         StartGame(data.mem.total_players, data.mem.bot_count);
+    }
+
+    // =========================================================================
+    // ONLINE LOBBY
+    // =========================================================================
+
+    void ShowOnlineLobby() {
+        gui_util.clear_menu();
+        MakeMenuBg();
+        data.mem.btn_create_room = gui_util.make_button_wide(0f, 0.5f,  new Color(0.3f, 0.85f, 0.4f), "Tao Phong");
+        data.mem.btn_join_room   = gui_util.make_button_wide(0f, -0.8f, new Color(0.3f, 0.6f, 0.95f), "Vao Phong");
+        data.mem.btn_random_match= gui_util.make_button_wide(0f, -2.1f, new Color(0.95f, 0.7f, 0.2f), "Tim Nhanh");
+        data.mem.back_button     = gui_util.make_button_wide(0f, -3.4f, new Color(0.8f, 0.3f, 0.3f),  "Quay Lai");
+        data.mem.menu_state = data.MenuState.OnlineLobby;
+    }
+
+    public void ShowWaitingScreen() {
+        gui_util.clear_menu();
+        MakeMenuBg();
+        string code = net_manager.instance != null ? net_manager.instance.GetRoomCode() : "???";
+        data.mem.online_status_label = gui_util.make_button_wide(0f, 0.5f, new Color(0.9f, 0.9f, 0.3f), "Phong: " + code);
+        gui_util.make_button_wide(0f, -0.5f, new Color(0.6f, 0.6f, 0.6f), "Cho doi thu...");
+        data.mem.back_button = gui_util.make_button_wide(0f, -2.5f, new Color(0.8f, 0.3f, 0.3f), "Huy");
+        data.mem.menu_state = data.MenuState.WaitingForOpponent;
+    }
+
+    // Called by net_manager RPC when both players are ready
+    void StartOnlineGame() {
+        data.mem.is_online_game = true;
+        StartGame(2, 0);
     }
 
     // =========================================================================
@@ -399,6 +468,10 @@ public class Game : MonoBehaviour {
     // =========================================================================
 
     void HandlePieceInput() {
+        // Block input khi là lượt của đối thủ online
+        if (data.mem.is_online_game && net_manager.instance != null
+            && data.mem.current_player_color != net_manager.instance.my_color) return;
+
         int hovered_i = -1, hovered_color = -1;
 
         for (int color = 0; color < data.mem.total_players; color++) {
@@ -461,6 +534,10 @@ public class Game : MonoBehaviour {
     // =========================================================================
 
     void HandleMovePlateInput() {
+        // Block input khi là lượt của đối thủ online
+        if (data.mem.is_online_game && net_manager.instance != null
+            && data.mem.current_player_color != net_manager.instance.my_color) return;
+
         for (int i = 0; i < data.mem.move_plate_list.Count; i++) {
             data.move_plate mp = data.mem.move_plate_list[i];
             if (mp.rect == null) continue;
@@ -491,6 +568,10 @@ public class Game : MonoBehaviour {
                 attacker.has_moved = 1;
                 ClearEnPassant();
             }
+
+            // Gửi nước đi qua mạng cho đối thủ
+            if (data.mem.is_online_game && net_manager.instance != null)
+                net_manager.instance.SendMove(mp.piece_index, mp.mat_x, mp.mat_y, mp.attack);
 
             data.mem.selected_a_piece = 0;
             piece_util.unselect_all_piece();
@@ -620,6 +701,10 @@ public class Game : MonoBehaviour {
     void ReturnToMainMenu() {
         StopAllCoroutines();
 
+        // Ngắt kết nối Photon nếu đang online
+        if (data.mem.is_online_game && net_manager.instance != null)
+            net_manager.instance.LeaveOnlineGame();
+
         // Destroy board
         if (data.mem.board != null) {
             foreach (var cell in data.mem.board)
@@ -650,6 +735,7 @@ public class Game : MonoBehaviour {
         // Reset state
         data.mem.game_started         = 0;
         data.mem.gameOver             = false;
+        data.mem.is_online_game       = false;
         data.mem.current_player_color = 0;
         data.mem.selected_a_piece     = 0;
         data.mem.play_against_AI      = 0;

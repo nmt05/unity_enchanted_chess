@@ -69,6 +69,32 @@ public static class gui_util {
         return btn;
     }
 
+    // Wide button variant (wider horizontally)
+    public static rect_2d make_button_wide(float x, float y, Color color, string text = ""){
+        rect_2d btn = rect_2d.create(x, y, -1f);
+        btn.set_sprite(data.mem.rect_2d_sprite);
+        btn.set_sprite_size(3.5f, BTN_H);
+        btn.set_collider_size(3.5f, BTN_H);
+        btn.set_color(color);
+        data.mem.menu_rects.Add(btn);
+
+        if (!string.IsNullOrEmpty(text) && btn.obj != null) {
+            GameObject textObj = new GameObject("ButtonText");
+            textObj.transform.SetParent(btn.obj.transform);
+            textObj.transform.localPosition = new Vector3(0, 0, -0.1f);
+
+            TextMesh tm = textObj.AddComponent<TextMesh>();
+            tm.text = text;
+            tm.characterSize = 0.15f;
+            tm.fontSize = 40;
+            tm.anchor = TextAnchor.MiddleCenter;
+            tm.alignment = TextAlignment.Center;
+            tm.color = Color.black;
+        }
+
+        return btn;
+    }
+
     // Returns true and consumes the click if the button was unclicked.
     public static bool clicked(rect_2d btn) {
         if (btn == null) return false;
@@ -102,6 +128,11 @@ public static class gui_util {
         data.mem.btn_diff3    = null;
         data.mem.btn_diff4    = null;
         data.mem.btn_main_menu = null;
+        data.mem.online_pvp_button = null;
+        data.mem.btn_create_room   = null;
+        data.mem.btn_join_room     = null;
+        data.mem.btn_random_match  = null;
+        data.mem.online_status_label = null;
         // NOTE: settings_button is NOT cleared here — it persists during gameplay.
     }
 

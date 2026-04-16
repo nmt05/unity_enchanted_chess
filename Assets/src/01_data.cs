@@ -12,7 +12,7 @@ public class data : MonoBehaviour {
     // MENU STATE
     // =========================================================================
 
-    public enum MenuState { None, Main, PickPlayerCount, PickBotCount, PickBotDifficulty, Settings }
+    public enum MenuState { None, Main, PickPlayerCount, PickBotCount, PickBotDifficulty, Settings, OnlineLobby, WaitingForOpponent }
     public MenuState menu_state = MenuState.None;
 
     // =========================================================================
@@ -203,6 +203,14 @@ public class data : MonoBehaviour {
     public rect_2d btn_diff2;
     public rect_2d btn_diff3;
     public rect_2d btn_diff4;
+
+    // Online PvP
+    public rect_2d online_pvp_button;
+    public rect_2d btn_create_room;
+    public rect_2d btn_join_room;
+    public rect_2d btn_random_match;
+    public rect_2d online_status_label;
+    public bool is_online_game = false;
 
     // flat list for easy bulk-destroy
     public List<rect_2d> menu_rects = new List<rect_2d>();

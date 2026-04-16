@@ -39,9 +39,16 @@ sysinfo.txt
 *.apk
 *.unitypackage
 *.app
+*.exe
 .vs/
 *.pidb.meta
 *.pdb.meta
 .idea/
 *.sln.iml
 *.stackdump
+
+# --- Photon ---
+Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
+
+# --- Claude ---
+.claude/

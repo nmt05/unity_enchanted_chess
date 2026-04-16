@@ -128,8 +128,12 @@ public static void handle_card_input(int player_color) {
                     success = apply_card_effect(cardDataList[i], ref targetPiece, r.obj.transform.position);
 
                     if (success) {
+                        // Gửi card action qua mạng cho đối thủ
+                        if (data.mem.is_online_game && net_manager.instance != null)
+                            net_manager.instance.SendCardAction(player_color, i, tx, ty);
+
                         cardDataList.RemoveAt(i);
-                        refresh_card_visuals(player_color); 
+                        refresh_card_visuals(player_color);
                         sound_util.play_sound(data.mem.cardPlaySound);
                         // Cập nhật đúng phe
                         return;
@@ -178,10 +182,14 @@ public static void handle_card_input(int player_color) {
                 return false;
         }
     }
-public static void add_card(int player_color, CardType type) {
+public static void add_card(int player_color, CardType type, bool fromNetwork = false) {
     if (data.mem.total_players != 2 || data.mem.bot_count != 0) return;
     sound_util.play_sound(data.mem.cardDrawSound);
     if (data.mem == null) return;
+
+    // Sync card draw qua mạng (chỉ gửi nếu là local action, không phải nhận từ RPC)
+    if (!fromNetwork && data.mem.is_online_game && net_manager.instance != null)
+        net_manager.instance.SendAddCard(player_color, (int)type);
 
     // 1. Khởi tạo đối tượng thẻ mới
     data.Card newCard = new data.Card();
@@ -364,13 +372,9 @@ public static void add_card(int player_color, CardType type) {
             case CardType.Event:
                 return true;
             case CardType.Rock:
-                // 1. Lấy vị trí chuột trong World Space
-                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                
-                // 2. Chuyển đổi ngược từ World sang tọa độ Board (int x, int y)
-                // Công thức này đảo ngược từ hàm board_to_world của ông: v * 1.28f - 4.48f
-                int txyy = Mathf.RoundToInt((mousePos.x + 4.48f) / 1.28f);
-                int tyyy = Mathf.RoundToInt((mousePos.y + 4.48f) / 1.28f);
+                // Dùng effectPos thay vì mouse position (tương thích online)
+                int txyy = Mathf.RoundToInt((effectPos.x + 4.48f) / 1.28f);
+                int tyyy = Mathf.RoundToInt((effectPos.y + 4.48f) / 1.28f);
 
                 // 3. Kiểm tra hợp lệ
                 if (!board_util.on_board(txyy, tyyy)) return false;

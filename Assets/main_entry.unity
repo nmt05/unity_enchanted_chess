@@ -119,6 +119,75 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &190512785
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 190512788}
+  - component: {fileID: 190512787}
+  - component: {fileID: 190512786}
+  m_Layer: 0
+  m_Name: NetworkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &190512786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190512785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 1
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &190512787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190512785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07b1e3fa6e763ec4fa631d5b820a8f8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  is_online: 0
+  my_color: -1
+--- !u!4 &190512788
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190512785}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 352.72507, y: 216.61172, z: -2.6620536}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &609339471
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,6 +323,12 @@ MonoBehaviour:
   btn_diff2: {fileID: 0}
   btn_diff3: {fileID: 0}
   btn_diff4: {fileID: 0}
+  online_pvp_button: {fileID: 0}
+  btn_create_room: {fileID: 0}
+  btn_join_room: {fileID: 0}
+  btn_random_match: {fileID: 0}
+  online_status_label: {fileID: 0}
+  is_online_game: 0
   menu_rects: []
   Card_board_bg_sprite: {fileID: -6143617487249537017, guid: ec9e230c087261e448a90f77605f02cd, type: 3}
   card_plus1: {fileID: 7148767697632595081, guid: 52b307c17ff65514a8c2872ec514e6f3, type: 3}
@@ -655,3 +730,4 @@ SceneRoots:
   - {fileID: 1728710305}
   - {fileID: 609339474}
   - {fileID: 2023649121}
+  - {fileID: 190512788}
